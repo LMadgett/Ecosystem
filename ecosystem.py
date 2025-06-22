@@ -23,7 +23,7 @@ class Animal:
     def get_eaten(self, predator):
         self.alive = False
         if predator.energy <= 100 - self.food_value:
-            predator.energy += self.food_value
+            predator.energy += self.food_value * 0.1
     
     def eat(self, food):
         food.get_eaten(self)
@@ -32,7 +32,7 @@ class Animal:
         distance_moved = distance(self.position, new_position)
         if distance_moved < self.move_distance:
             self.position = new_position
-            self.energy -= (1 / self.efficiency) * distance_moved
+            self.energy -= (100 / self.efficiency) * distance_moved
 
     def reproduce(self, partner):
         if self.type == partner.type:
@@ -47,8 +47,10 @@ class Animal:
 
 class Food:
     position = (0, 0)
+    food_value = 0
 
-    def __init__(self, position):
+    def __init__(self, food_value, position):
+        self.food_value = food_value
         self.position = position
     
     def get_eaten(self, predator):
@@ -58,3 +60,33 @@ class Food:
 
 def distance(pos1, pos2):
     return ((pos1[0] - pos2[0]) ** 2 + (pos1[1] - pos2[1]) ** 2) ** 0.5
+
+def initialise_ecosystem(num_rabbits, num_foxes, num_food, x_size, y_size):
+    foxes = []
+    rabbits = []
+    food = []
+
+    for r in range(num_rabbits):
+        genes = []
+        genes.append("rabbit")
+        genes.append(random.randint(50, 100)) #food value
+        genes.append(random.randint(25, 100)) #efficiency
+        genes.append(random.randint(10, 100)) #move distance
+        genes.append(random.randint(0, 100)) #reproductive urge
+        position = (random.randint(0, x_size), random.randint(0, y_size))
+        rabbits.append(Animal(genes, position))
+    
+    for f in range(num_foxes):
+        genes = []
+        genes.append("fox")
+        genes.append(random.randint(50, 100)) #food value
+        genes.append(random.randint(25, 100)) #efficiency
+        genes.append(random.randint(10, 100)) #move distance
+        genes.append(random.randint(0, 100)) #reproductive urge
+        position = (random.randint(0, x_size), random.randint(0, y_size))
+        foxes.append(Animal(genes, position))
+
+    for n in range(num_food):
+        position = (random.randint(0, x_size), random.randint(0, y_size))
+        food_value = random.randint(10, 100)
+        food.append(Food(food_value, position))
