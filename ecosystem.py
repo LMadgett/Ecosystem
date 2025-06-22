@@ -54,8 +54,11 @@ class Food:
 
     def get_eaten(self, predator):
         self.alive = False
+        scaling_factor = 0.1
+        if self.type == predator.type:
+            scaling_factor = 0.05 #cannibalism is less efficient
         if predator.energy <= 100 - self.food_value * 0.1:
-            predator.energy += self.food_value * 0.1
+            predator.energy += self.food_value * scaling_factor
 
 def initialise_ecosystem(num_rabbits, num_foxes, num_food, x_size, y_size):
     foxes = []
@@ -197,7 +200,7 @@ def move_animals(ecosystem):
             if action == "eat":
                 alive_rabbits = [r for r in rabbits if r.alive]
                 if len(alive_rabbits) == 0:
-                    if len(ecosystem[1] > 1):
+                    if len(ecosystem[1]) > 1:
                         # Foxes can eat other foxes if no rabbits are available
                         alive_foxes = [f for f in foxes if f is not fox and f.alive]
                         if alive_foxes:
