@@ -103,6 +103,9 @@ def move_animals(ecosystem):
             
             if action == "eat":
                 alive_food = [f for f in ecosystem[2] if f.alive]
+                if len(alive_food) == 0:
+                    print("No food left for rabbits")
+                    continue
                 closest_food = min(alive_food, key=lambda f: distance(rabbit.position, f.position))
                 #print(closest_food.position)
                 if distance(rabbit.position, closest_food.position) <= rabbit.move_distance:
@@ -155,7 +158,11 @@ def move_animals(ecosystem):
                 action = "reproduce"
             
             if action == "eat":
-                closest_rabbit = min(ecosystem[0], key=lambda r: distance(fox.position, r.position) if r.alive else float('inf'))
+                alive_rabbits = [r for r in ecosystem[0] if r.alive]
+                if len(alive_rabbits) == 0:
+                    print("No rabbits left for foxes")
+                    continue
+                closest_rabbit = min(alive_rabbits, key=lambda r: distance(fox.position, r.position))
                 if distance(fox.position, closest_rabbit.position) <= fox.move_distance and closest_rabbit.alive:
                     fox.move(closest_rabbit.position)
                     fox.eat(closest_rabbit)
@@ -200,7 +207,7 @@ def move_animals(ecosystem):
                     fox.move(new_position)
     
 def display_ecosystem():
-    num_rabbits = 5
+    num_rabbits = 7
     num_foxes = 2
     num_food = 50
     x_size = 1024
@@ -239,6 +246,6 @@ def display_ecosystem():
                 pygame.draw.circle(screen, (0, 255, 0), (int(food.position[0]), int(food.position[1])), 6)
         
         pygame.display.flip()
-        pygame.time.delay(100)
+        pygame.time.delay(300)
 
 display_ecosystem()
