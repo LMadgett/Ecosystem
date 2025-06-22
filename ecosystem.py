@@ -63,7 +63,7 @@ def initialise_ecosystem(num_rabbits, num_foxes, num_food, x_size, y_size):
     food = []
     ecosystem = []
 
-    rabbit_min_food_value = 50
+    rabbit_min_food_value = 20
     rabbit_min_efficiency = 50
     rabbit_min_move_distance = 50
     rabbit_min_reproductive_urge = 20
@@ -197,9 +197,38 @@ def move_animals(ecosystem):
             if action == "eat":
                 alive_rabbits = [r for r in rabbits if r.alive]
                 if len(alive_rabbits) == 0:
-                    new_position = (fox.position[0] + random.randint(-fox.move_distance, fox.move_distance),
-                                    fox.position[1] + random.randint(-fox.move_distance, fox.move_distance))
-                    fox.move(new_position)
+                    if len(ecosystem[1] > 1):
+                        # Foxes can eat other foxes if no rabbits are available
+                        alive_foxes = [f for f in foxes if f is not fox and f.alive]
+                        if alive_foxes:
+                            closest_fox = min(alive_foxes, key=lambda f: distance(fox.position, f.position))
+                            if distance(fox.position, closest_fox.position) <= fox.move_distance and closest_fox.alive:
+                                fox.move(closest_fox.position)
+                                fox.eat(closest_fox)
+                                if closest_fox in foxes:
+                                    foxes.remove(closest_fox)
+                            else:
+                                dx = closest_fox.position[0] - fox.position[0]
+                                dy = closest_fox.position[1] - fox.position[1]
+                                dist = distance(fox.position, closest_fox.position)
+                                if dist == 0:
+                                    ratio = 0
+                                else:
+                                    ratio = fox.move_distance / dist
+                                if ratio > 1:
+                                    ratio = 1
+                                new_x = fox.position[0] + dx * ratio
+                                new_y = fox.position[1] + dy * ratio
+                                new_position = (new_x, new_y)
+                                fox.move(new_position)
+                        else:
+                            new_position = (fox.position[0] + random.randint(-fox.move_distance, fox.move_distance),
+                                            fox.position[1] + random.randint(-fox.move_distance, fox.move_distance))
+                            fox.move(new_position)
+                    else:
+                        new_position = (fox.position[0] + random.randint(-fox.move_distance, fox.move_distance),
+                                        fox.position[1] + random.randint(-fox.move_distance, fox.move_distance))
+                        fox.move(new_position)
                 else:
                     closest_rabbit = min(alive_rabbits, key=lambda r: distance(fox.position, r.position))
                     if distance(fox.position, closest_rabbit.position) <= fox.move_distance and closest_rabbit.alive:
