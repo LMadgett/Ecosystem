@@ -63,23 +63,33 @@ def initialise_ecosystem(num_rabbits, num_foxes, num_food, x_size, y_size):
     food = []
     ecosystem = []
 
+    rabbit_min_food_value = 50
+    rabbit_min_efficiency = 50
+    rabbit_min_move_distance = 10
+    rabbit_min_reproductive_urge = 50
+
+    fox_min_food_value = 50
+    fox_min_efficiency = 50
+    fox_min_move_distance = 10
+    fox_min_reproductive_urge = 10
+
     for r in range(num_rabbits):
         genes = []
         genes.append("rabbit")
-        genes.append(random.randint(50, 100)) #food value
-        genes.append(random.randint(50, 100)) #efficiency
-        genes.append(random.randint(10, 100)) #move distance
-        genes.append(random.randint(5, 100)) #reproductive urge
+        genes.append(random.randint(rabbit_min_food_value, 100)) #food value
+        genes.append(random.randint(rabbit_min_efficiency, 100)) #efficiency
+        genes.append(random.randint(rabbit_min_move_distance, 100)) #move distance
+        genes.append(random.randint(rabbit_min_reproductive_urge, 100)) #reproductive urge
         position = (random.randint(0, x_size), random.randint(0, y_size))
         rabbits.append(Animal(genes, position))
     
     for f in range(num_foxes):
         genes = []
         genes.append("fox")
-        genes.append(random.randint(50, 100)) #food value
-        genes.append(random.randint(50, 100)) #efficiency
-        genes.append(random.randint(10, 100)) #move distance
-        genes.append(random.randint(5, 100)) #reproductive urge
+        genes.append(random.randint(fox_min_food_value, 100)) #food value
+        genes.append(random.randint(fox_min_efficiency, 100)) #efficiency
+        genes.append(random.randint(fox_min_move_distance, 100)) #move distance
+        genes.append(random.randint(fox_min_reproductive_urge, 100)) #reproductive urge
         position = (random.randint(0, x_size), random.randint(0, y_size))
         foxes.append(Animal(genes, position))
 
@@ -104,7 +114,7 @@ def move_animals(ecosystem):
             rabbit.alive = False
         if not rabbit.alive:
             rabbits.remove(rabbit)
-            print(f"Rabbit {i} died")
+            #print(f"Rabbit {i} died")
         else:
             rabbit.energy -= 1  # Decrease energy for each move
             action = "eat"
@@ -167,13 +177,13 @@ def move_animals(ecosystem):
 
     for fox in foxes[:]:
         j = foxes.index(fox)
-        print(f"fox {j} energy {fox.energy}")
+        #print(f"fox {j} energy {fox.energy}")
         #print(f"Moving fox {j}")
         if fox.energy <= 0:
             fox.alive = False
         if not fox.alive:
             foxes.remove(fox)
-            print(f"Fox {j} died")
+            #print(f"Fox {j} died")
         else:
             fox.energy -= 1  # Decrease energy for each move
             action = "eat"
@@ -238,7 +248,7 @@ def move_animals(ecosystem):
     ecosystem[1] = foxes  # Update the ecosystem with the remaining foxes
 
 def display_ecosystem():
-    num_rabbits = 10
+    num_rabbits = 20
     num_foxes = 3
     num_food = 50
     x_size = 1024
