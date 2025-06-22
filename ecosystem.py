@@ -65,12 +65,12 @@ def initialise_ecosystem(num_rabbits, num_foxes, num_food, x_size, y_size):
 
     rabbit_min_food_value = 50
     rabbit_min_efficiency = 50
-    rabbit_min_move_distance = 10
-    rabbit_min_reproductive_urge = 50
+    rabbit_min_move_distance = 50
+    rabbit_min_reproductive_urge = 20
 
     fox_min_food_value = 50
     fox_min_efficiency = 50
-    fox_min_move_distance = 10
+    fox_min_move_distance = 50
     fox_min_reproductive_urge = 10
 
     for r in range(num_rabbits):
@@ -248,11 +248,15 @@ def move_animals(ecosystem):
     ecosystem[1] = foxes  # Update the ecosystem with the remaining foxes
 
 def display_ecosystem():
-    num_rabbits = 20
-    num_foxes = 3
-    num_food = 50
+    num_rabbits = 30
+    num_foxes = 2
+    num_food = 75
     x_size = 1024
     y_size = 1024
+
+    rabbit_nums = []
+    fox_nums = []
+    food_nums = []
     
     ecosystem = initialise_ecosystem(num_rabbits, num_foxes, num_food, x_size, y_size)
     
@@ -276,7 +280,13 @@ def display_ecosystem():
 
         screen.fill((0, 0, 0))
         move_animals(ecosystem)
-        print(f"Rabbits: {len([r for r in ecosystem[0] if r.alive])}, Foxes: {len([f for f in ecosystem[1] if f.alive])}, Food: {len([f for f in ecosystem[2] if f.alive])}")
+        num_r = len([r for r in ecosystem[0] if r.alive])
+        num_f = len([f for f in ecosystem[1] if f.alive])
+        num_fd = len([f for f in ecosystem[2] if f.alive])
+        #print(f"Rabbits: {num_r}, Foxes: {num_f}, Food: {num_fd}")
+        rabbit_nums.append(num_r)
+        fox_nums.append(num_f)
+        food_nums.append(num_fd)
         
         for rabbit in ecosystem[0]:
             #print(rabbit.position)
@@ -291,6 +301,10 @@ def display_ecosystem():
         for food in ecosystem[2]:
             if food.alive:
                 pygame.draw.circle(screen, (0, 255, 0), (int(food.position[0]), int(food.position[1])), 6)
+        
+        font = pygame.font.SysFont(None, 36)
+        text_surface = font.render(f"Rabbits: {num_r}  Foxes: {num_f}  Food: {num_fd}", True, (255, 255, 255))
+        screen.blit(text_surface, (10, 10))
         
         pygame.time.delay(300)
         pygame.display.flip()
