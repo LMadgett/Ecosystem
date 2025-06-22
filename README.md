@@ -7,6 +7,7 @@ A simple ecosystem simulator in Python featuring rabbits, foxes, and a food supp
 - Adjustable parameters for birth rates, death rates, predation, and food regeneration.
 - Step-by-step simulation with population tracking.
 - Easily extensible for more species or environmental factors.
+- Foxes turn to cannibalism if food supplies are depleted, this is less efficient.
 
 ## Usage
 
