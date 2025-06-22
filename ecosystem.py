@@ -106,6 +106,7 @@ def move_animals(ecosystem):
             rabbits.remove(rabbit)
             print(f"Rabbit {i} died")
         else:
+            rabbit.energy -= 1  # Decrease energy for each move
             action = "eat"
             if rabbit.energy < 100 - rabbit.reproductive_urge:
                 action = "eat"
@@ -174,6 +175,7 @@ def move_animals(ecosystem):
             foxes.remove(fox)
             print(f"Fox {j} died")
         else:
+            fox.energy -= 1  # Decrease energy for each move
             action = "eat"
             if fox.energy < 100 - fox.reproductive_urge:
                 action = "eat"
@@ -256,6 +258,11 @@ def display_ecosystem():
             if event.type == pygame.QUIT:
                 running = False
         #print(count)
+        food_respawn_rate = 1  # Number of food items to respawn each iteration
+        for i in range(food_respawn_rate):
+            position = (random.randint(0, x_size), random.randint(0, y_size))
+            food_value = random.randint(10, 100)
+            ecosystem[2].append(Food(food_value, position))
 
         screen.fill((0, 0, 0))
         move_animals(ecosystem)
