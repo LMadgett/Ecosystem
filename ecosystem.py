@@ -47,6 +47,7 @@ class Animal:
 
 class Food:
     position = (0, 0)
+    alive = True
     food_value = 0
 
     def __init__(self, food_value, position):
@@ -65,6 +66,7 @@ def initialise_ecosystem(num_rabbits, num_foxes, num_food, x_size, y_size):
     foxes = []
     rabbits = []
     food = []
+    ecosystem = []
 
     for r in range(num_rabbits):
         genes = []
@@ -90,3 +92,57 @@ def initialise_ecosystem(num_rabbits, num_foxes, num_food, x_size, y_size):
         position = (random.randint(0, x_size), random.randint(0, y_size))
         food_value = random.randint(10, 100)
         food.append(Food(food_value, position))
+
+    ecosystem = [rabbits, foxes, food]
+
+def move_animals(ecosystem):
+    for rabbit in ecosystem[0]:
+        if not rabbit.alive:
+            continue
+        else:
+            action = ""
+            if rabbit.energy > rabbit.reproductive_urge:
+                action = "eat"
+            elif rabbit.energy < rabbit.reproductive_urge:
+                action = "reproduce"
+            
+            if action == "eat":
+                closest_food = min(ecosystem[2], key=lambda f: distance(rabbit.position, f.position))
+                if distance(rabbit.position, closest_food.position) <= rabbit.move_distance:
+                    rabbit.move(closest_food.position)
+                    rabbit.eat(closest_food)
+                else:
+                    # Move towards the closest food by up to move_distance
+                    dx = closest_food.position[0] - rabbit.position[0]
+                    dy = closest_food.position[1] - rabbit.position[1]
+                    dist = distance(rabbit.position, closest_food.position)
+                    ratio = rabbit.move_distance / dist
+                    if ratio > 1:
+                        ratio = 1
+                    new_x = rabbit.position[0] + dx * ratio
+                    new_y = rabbit.position[1] + dy * ratio
+                    new_position = (new_x, new_y)
+                    rabbit.move(new_position)
+            elif action == "reproduce":
+                # Find the closest other rabbit to reproduce with
+                other_rabbits = [r for r in ecosystem[0] if r is not rabbit and r.alive]
+                if not other_rabbits:
+                    return
+                closest_rabbit = min(other_rabbits, key=lambda r: distance(rabbit.position, r.position))
+                if distance(rabbit.position, closest_rabbit.position) <= rabbit.move_distance:
+                    rabbit.move(closest_rabbit.position)
+                    # Attempt to reproduce if close enough
+                    offspring = rabbit.reproduce(closest_rabbit)
+                    ecosystem[0].append(offspring)
+                else:
+                    # Move towards the closest rabbit by up to move_distance
+                    dx = closest_rabbit.position[0] - rabbit.position[0]
+                    dy = closest_rabbit.position[1] - rabbit.position[1]
+                    dist = distance(rabbit.position, closest_rabbit.position)
+                    ratio = rabbit.move_distance / dist
+                    if ratio > 1:
+                        ratio = 1
+                    new_x = rabbit.position[0] + dx * ratio
+                    new_y = rabbit.position[1] + dy * ratio
+                    new_position = (new_x, new_y)
+                    rabbit.move(new_position)
