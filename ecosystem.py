@@ -13,7 +13,7 @@ class Animal:
         self.genes = genes
         self.position = position
         self.alive = True
-        self.energy = 10
+        self.energy = 10 #100
 
     def get_eaten(self, predator):
         self.alive = False
@@ -24,7 +24,11 @@ class Animal:
         food.get_eaten(self)
     
     def move(self, new_position):
-        self.position = new_position
+        if new_position != self.position:
+            self.position = new_position
+        else:
+            print(f"wtf, {self.type} tried to move to the same position")
+        #print(f"{self.type} moved to {self.position}")
         #self.energy -= (100 / self.efficiency) * distance_moved
 
     def reproduce(self, partner):
@@ -98,11 +102,13 @@ def move_animals(ecosystem):
                 action = "reproduce"
             
             if action == "eat":
-                closest_food = min(ecosystem[2], key=lambda f: distance(rabbit.position, f.position))
+                alive_food = [f for f in ecosystem[2] if f.alive]
+                closest_food = min(alive_food, key=lambda f: distance(rabbit.position, f.position))
                 #print(closest_food.position)
                 if distance(rabbit.position, closest_food.position) <= rabbit.move_distance:
                     rabbit.move(closest_food.position)
                     rabbit.eat(closest_food)
+                    ecosystem[2].remove(closest_food)
                 else:
                     # Move towards the closest food by up to move_distance
                     dx = closest_food.position[0] - rabbit.position[0]
@@ -153,6 +159,7 @@ def move_animals(ecosystem):
                 if distance(fox.position, closest_rabbit.position) <= fox.move_distance and closest_rabbit.alive:
                     fox.move(closest_rabbit.position)
                     fox.eat(closest_rabbit)
+                    ecosystem[0].remove(closest_rabbit)  # Remove the rabbit from the ecosystem
                 else:
                     # Move towards the closest rabbit by up to move_distance
                     dx = closest_rabbit.position[0] - fox.position[0]
@@ -193,11 +200,11 @@ def move_animals(ecosystem):
                     fox.move(new_position)
     
 def display_ecosystem():
-    num_rabbits = 2
+    num_rabbits = 5
     num_foxes = 2
-    num_food = 20
-    x_size = 800
-    y_size = 600
+    num_food = 50
+    x_size = 1024
+    y_size = 1024
     
     ecosystem = initialise_ecosystem(num_rabbits, num_foxes, num_food, x_size, y_size)
     
@@ -232,5 +239,6 @@ def display_ecosystem():
                 pygame.draw.circle(screen, (0, 255, 0), (int(food.position[0]), int(food.position[1])), 6)
         
         pygame.display.flip()
+        pygame.time.delay(100)
 
 display_ecosystem()
