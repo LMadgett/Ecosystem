@@ -1,66 +1,56 @@
 import random
+import pygame
 
 MUTATION_RATE = 0.1
 
 class Animal:
-    type = ""
-    food_value = 0
-    efficiency = 0
-    move_distance = 0
-    reproductive_urge = 0
-    position = (0, 0)
-    alive = True
-    energy = 100
-
     def __init__(self, genes, position):
         self.type = genes[0]
         self.food_value = genes[1]
         self.efficiency = genes[2]
         self.move_distance = genes[3]
         self.reproductive_urge = genes[4]
+        self.genes = genes
         self.position = position
+        self.alive = True
+        self.energy = 10
 
     def get_eaten(self, predator):
         self.alive = False
-        if predator.energy <= 100 - self.food_value:
+        if predator.energy <= 100 - self.food_value * 0.1:
             predator.energy += self.food_value * 0.1
     
     def eat(self, food):
         food.get_eaten(self)
     
     def move(self, new_position):
-        distance_moved = distance(self.position, new_position)
-        if distance_moved < self.move_distance:
-            self.position = new_position
-            self.energy -= (100 / self.efficiency) * distance_moved
+        self.position = new_position
+        #self.energy -= (100 / self.efficiency) * distance_moved
 
     def reproduce(self, partner):
         if self.type == partner.type:
             new_genes = [self.type]
-            for i in range(len(self.genes)):
+            for i in range(1, len(self.genes)):
                 if random.random() < MUTATION_RATE:
-                    new_genes.append(random.randint(0, 100))
+                    new_genes.append(random.randint(5, 100))
                 else:
                     new_genes.append((self.genes[i] + partner.genes[i]) // 2)
         offspring = Animal(new_genes, self.position)
         return offspring
 
-class Food:
-    position = (0, 0)
-    alive = True
-    food_value = 0
+def distance(pos1, pos2):
+    return ((pos1[0] - pos2[0]) ** 2 + (pos1[1] - pos2[1]) ** 2) ** 0.5
 
+class Food:
     def __init__(self, food_value, position):
         self.food_value = food_value
         self.position = position
-    
+        self.alive = True
+
     def get_eaten(self, predator):
         self.alive = False
-        if predator.energy <= 100 - self.food_value:
-            predator.energy += self.food_value
-
-def distance(pos1, pos2):
-    return ((pos1[0] - pos2[0]) ** 2 + (pos1[1] - pos2[1]) ** 2) ** 0.5
+        if predator.energy <= 100 - self.food_value * 0.1:
+            predator.energy += self.food_value * 0.1
 
 def initialise_ecosystem(num_rabbits, num_foxes, num_food, x_size, y_size):
     foxes = []
@@ -74,7 +64,7 @@ def initialise_ecosystem(num_rabbits, num_foxes, num_food, x_size, y_size):
         genes.append(random.randint(50, 100)) #food value
         genes.append(random.randint(25, 100)) #efficiency
         genes.append(random.randint(10, 100)) #move distance
-        genes.append(random.randint(0, 100)) #reproductive urge
+        genes.append(random.randint(5, 100)) #reproductive urge
         position = (random.randint(0, x_size), random.randint(0, y_size))
         rabbits.append(Animal(genes, position))
     
@@ -84,7 +74,7 @@ def initialise_ecosystem(num_rabbits, num_foxes, num_food, x_size, y_size):
         genes.append(random.randint(50, 100)) #food value
         genes.append(random.randint(25, 100)) #efficiency
         genes.append(random.randint(10, 100)) #move distance
-        genes.append(random.randint(0, 100)) #reproductive urge
+        genes.append(random.randint(5, 100)) #reproductive urge
         position = (random.randint(0, x_size), random.randint(0, y_size))
         foxes.append(Animal(genes, position))
 
@@ -93,7 +83,8 @@ def initialise_ecosystem(num_rabbits, num_foxes, num_food, x_size, y_size):
         food_value = random.randint(10, 100)
         food.append(Food(food_value, position))
 
-    ecosystem = [rabbits, foxes, food]
+    ecosystem = [rabbits, foxes, food, x_size, y_size]
+    return ecosystem
 
 def move_animals(ecosystem):
     for rabbit in ecosystem[0]:
@@ -101,13 +92,14 @@ def move_animals(ecosystem):
             continue
         else:
             action = ""
-            if rabbit.energy > rabbit.reproductive_urge:
+            if rabbit.energy < 100 - rabbit.reproductive_urge:
                 action = "eat"
-            elif rabbit.energy < rabbit.reproductive_urge:
+            elif rabbit.energy > 100 - rabbit.reproductive_urge:
                 action = "reproduce"
             
             if action == "eat":
                 closest_food = min(ecosystem[2], key=lambda f: distance(rabbit.position, f.position))
+                #print(closest_food.position)
                 if distance(rabbit.position, closest_food.position) <= rabbit.move_distance:
                     rabbit.move(closest_food.position)
                     rabbit.eat(closest_food)
@@ -151,9 +143,9 @@ def move_animals(ecosystem):
             continue
         else:
             action = ""
-            if fox.energy > fox.reproductive_urge:
+            if fox.energy < 100 - fox.reproductive_urge:
                 action = "eat"
-            elif fox.energy < fox.reproductive_urge:
+            elif fox.energy > 100 - fox.reproductive_urge:
                 action = "reproduce"
             
             if action == "eat":
@@ -166,7 +158,10 @@ def move_animals(ecosystem):
                     dx = closest_rabbit.position[0] - fox.position[0]
                     dy = closest_rabbit.position[1] - fox.position[1]
                     dist = distance(fox.position, closest_rabbit.position)
-                    ratio = fox.move_distance / dist
+                    if dist == 0:
+                        ratio = 0
+                    else:
+                        ratio = fox.move_distance / dist
                     if ratio > 1:
                         ratio = 1
                     new_x = fox.position[0] + dx * ratio
@@ -193,4 +188,49 @@ def move_animals(ecosystem):
                     if ratio > 1:
                         ratio = 1
                     new_x = fox.position[0] + dx * ratio
-                    new_y = fox.position
+                    new_y = fox.position[1] + dy * ratio
+                    new_position = (new_x, new_y)
+                    fox.move(new_position)
+    
+def display_ecosystem():
+    num_rabbits = 2
+    num_foxes = 2
+    num_food = 20
+    x_size = 800
+    y_size = 600
+    
+    ecosystem = initialise_ecosystem(num_rabbits, num_foxes, num_food, x_size, y_size)
+    
+    pygame.init()
+    screen = pygame.display.set_mode((ecosystem[3], ecosystem[4]))
+    pygame.display.set_caption("Ecosystem Simulation")
+    
+    count = 0
+    running = True
+    while running:
+        count += 1
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+        #print(count)
+
+        screen.fill((0, 0, 0))
+        move_animals(ecosystem)
+        
+        for rabbit in ecosystem[0]:
+            #print(rabbit.position)
+            if rabbit.alive:
+                pygame.draw.circle(screen, (255, 255, 0), (int(rabbit.position[0]), int(rabbit.position[1])), 10)
+        
+        for fox in ecosystem[1]:
+            if fox.alive:
+                pygame.draw.circle(screen, (255, 0, 0), (int(fox.position[0]), int(fox.position[1])), 10)
+                #print(fox.position)
+        
+        for food in ecosystem[2]:
+            if food.alive:
+                pygame.draw.circle(screen, (0, 255, 0), (int(food.position[0]), int(food.position[1])), 6)
+        
+        pygame.display.flip()
+
+display_ecosystem()
