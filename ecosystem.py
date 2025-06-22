@@ -146,3 +146,51 @@ def move_animals(ecosystem):
                     new_y = rabbit.position[1] + dy * ratio
                     new_position = (new_x, new_y)
                     rabbit.move(new_position)
+    for fox in ecosystem[1]:
+        if not fox.alive:
+            continue
+        else:
+            action = ""
+            if fox.energy > fox.reproductive_urge:
+                action = "eat"
+            elif fox.energy < fox.reproductive_urge:
+                action = "reproduce"
+            
+            if action == "eat":
+                closest_rabbit = min(ecosystem[0], key=lambda r: distance(fox.position, r.position) if r.alive else float('inf'))
+                if distance(fox.position, closest_rabbit.position) <= fox.move_distance and closest_rabbit.alive:
+                    fox.move(closest_rabbit.position)
+                    fox.eat(closest_rabbit)
+                else:
+                    # Move towards the closest rabbit by up to move_distance
+                    dx = closest_rabbit.position[0] - fox.position[0]
+                    dy = closest_rabbit.position[1] - fox.position[1]
+                    dist = distance(fox.position, closest_rabbit.position)
+                    ratio = fox.move_distance / dist
+                    if ratio > 1:
+                        ratio = 1
+                    new_x = fox.position[0] + dx * ratio
+                    new_y = fox.position[1] + dy * ratio
+                    new_position = (new_x, new_y)
+                    fox.move(new_position)
+            elif action == "reproduce":
+                # Find the closest other fox to reproduce with
+                other_foxes = [f for f in ecosystem[1] if f is not fox and f.alive]
+                if not other_foxes:
+                    return
+                closest_fox = min(other_foxes, key=lambda f: distance(fox.position, f.position))
+                if distance(fox.position, closest_fox.position) <= fox.move_distance:
+                    fox.move(closest_fox.position)
+                    # Attempt to reproduce if close enough
+                    offspring = fox.reproduce(closest_fox)
+                    ecosystem[1].append(offspring)
+                else:
+                    # Move towards the closest fox by up to move_distance
+                    dx = closest_fox.position[0] - fox.position[0]
+                    dy = closest_fox.position[1] - fox.position[1]
+                    dist = distance(fox.position, closest_fox.position)
+                    ratio = fox.move_distance / dist
+                    if ratio > 1:
+                        ratio = 1
+                    new_x = fox.position[0] + dx * ratio
+                    new_y = fox.position
