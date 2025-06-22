@@ -106,10 +106,10 @@ def move_animals(ecosystem):
             rabbits.remove(rabbit)
             print(f"Rabbit {i} died")
         else:
-            action = ""
+            action = "eat"
             if rabbit.energy < 100 - rabbit.reproductive_urge:
                 action = "eat"
-            elif rabbit.energy > 100 - rabbit.reproductive_urge:
+            elif rabbit.energy > 100 - rabbit.reproductive_urge and len(rabbits) > 1:
                 action = "reproduce"
             #print(f"Rabbit energy: {rabbit.energy}, action: {action}")
 
@@ -174,10 +174,10 @@ def move_animals(ecosystem):
             foxes.remove(fox)
             print(f"Fox {j} died")
         else:
-            action = ""
+            action = "eat"
             if fox.energy < 100 - fox.reproductive_urge:
                 action = "eat"
-            elif fox.energy > 100 - fox.reproductive_urge:
+            elif fox.energy > 100 - fox.reproductive_urge and len(foxes) > 1:
                 action = "reproduce"
 
             #print(f"Fox energy: {fox.energy}, action: {action}")
@@ -236,11 +236,11 @@ def move_animals(ecosystem):
     ecosystem[1] = foxes  # Update the ecosystem with the remaining foxes
 
 def display_ecosystem():
-    num_rabbits = 7
-    num_foxes = 2
+    num_rabbits = 10
+    num_foxes = 3
     num_food = 50
-    x_size = 800
-    y_size = 800
+    x_size = 1024
+    y_size = 1024
     
     ecosystem = initialise_ecosystem(num_rabbits, num_foxes, num_food, x_size, y_size)
     
