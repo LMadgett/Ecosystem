@@ -1,5 +1,6 @@
 import random
 import pygame
+import matplotlib.pyplot as plt
 
 MUTATION_RATE = 0.1
 
@@ -110,7 +111,7 @@ def move_animals(ecosystem):
     foxes = ecosystem[1]
 
     # Iterate over a copy of the list to avoid index errors when removing
-    for rabbit in rabbits[:]:
+    for rabbit in rabbits:
         i = rabbits.index(rabbit)
         #print(f"Moving rabbit {i}")
         if rabbit.energy <= 0:
@@ -178,7 +179,7 @@ def move_animals(ecosystem):
                     rabbit.move(new_position)
     ecosystem[0] = rabbits  # Update the ecosystem with the remaining rabbits
 
-    for fox in foxes[:]:
+    for fox in foxes:
         j = foxes.index(fox)
         #print(f"fox {j} energy {fox.energy}")
         #print(f"Moving fox {j}")
@@ -282,13 +283,17 @@ def move_animals(ecosystem):
 def display_ecosystem():
     num_rabbits = 30
     num_foxes = 2
-    num_food = 75
+    num_food = 100
     x_size = 1024
     y_size = 1024
 
     rabbit_nums = []
     fox_nums = []
     food_nums = []
+
+    num_r = 0
+    num_f = 0
+    num_fd = 0
     
     ecosystem = initialise_ecosystem(num_rabbits, num_foxes, num_food, x_size, y_size)
     
@@ -304,7 +309,7 @@ def display_ecosystem():
             if event.type == pygame.QUIT:
                 running = False
         #print(count)
-        food_respawn_rate = 1  # Number of food items to respawn each iteration
+        food_respawn_rate = 2  # Number of food items to respawn each iteration
         for i in range(food_respawn_rate):
             position = (random.randint(0, x_size), random.randint(0, y_size))
             food_value = random.randint(10, 100)
@@ -340,5 +345,15 @@ def display_ecosystem():
         
         pygame.time.delay(300)
         pygame.display.flip()
+    return (rabbit_nums, fox_nums, food_nums)
 
-display_ecosystem()
+(rabbit_nums, fox_nums, food_nums) = display_ecosystem()
+plt.plot(range(len(rabbit_nums)), rabbit_nums, label='Rabbits')
+plt.plot(range(len(fox_nums)), fox_nums, label='Foxes')
+plt.plot(range(len(food_nums)), food_nums, label='Food')
+plt.xlabel('Time Steps')
+plt.ylabel('Population')
+plt.title('Ecosystem Simulation')
+plt.legend()
+plt.show()
+exit()
