@@ -23,6 +23,8 @@ class Animal:
             scaling_factor = 0.05 #cannibalism is less efficient
         if predator.energy <= 100 - self.food_value * 0.1:
             predator.energy += self.food_value * scaling_factor
+        elif predator.energy <= 100:
+            predator.energy = 100
     
     def eat(self, food):
         food.get_eaten(self)
@@ -43,8 +45,9 @@ class Animal:
                 else:
                     new_genes.append((self.genes[i] + partner.genes[i]) // 2)
         offspring = Animal(new_genes, self.position)
-        self.energy -= self.reproductive_urge
-        partner.energy -= partner.reproductive_urge
+        reproduction_cost = 0.5
+        self.energy -= 0.5 * self.reproductive_urge
+        partner.energy -= 0.5 * partner.reproductive_urge
         return offspring
 
 def distance(pos1, pos2):
@@ -60,6 +63,8 @@ class Food:
         self.alive = False
         if predator.energy <= 100 - self.food_value * 0.1:
             predator.energy += self.food_value * 0.1
+        elif predator.energy <= 100:
+            predator.energy = 100
 
 def initialise_ecosystem(num_rabbits, num_foxes, num_food, x_size, y_size):
     foxes = []
@@ -70,7 +75,7 @@ def initialise_ecosystem(num_rabbits, num_foxes, num_food, x_size, y_size):
     rabbit_min_food_value = 20
     rabbit_min_efficiency = 50
     rabbit_min_move_distance = 50
-    rabbit_min_reproductive_urge = 40
+    rabbit_min_reproductive_urge = 10
 
     fox_min_food_value = 50
     fox_min_efficiency = 50
@@ -281,7 +286,7 @@ def move_animals(ecosystem):
     ecosystem[1] = foxes  # Update the ecosystem with the remaining foxes
 
 def display_ecosystem():
-    num_rabbits = 30
+    num_rabbits = 5
     num_foxes = 2
     num_food = 100
     x_size = 1024
