@@ -70,7 +70,7 @@ def initialise_ecosystem(num_rabbits, num_foxes, num_food, x_size, y_size):
     rabbit_min_food_value = 20
     rabbit_min_efficiency = 50
     rabbit_min_move_distance = 50
-    rabbit_min_reproductive_urge = 20
+    rabbit_min_reproductive_urge = 40
 
     fox_min_food_value = 50
     fox_min_efficiency = 50
@@ -356,4 +356,5 @@ plt.ylabel('Population')
 plt.title('Ecosystem Simulation')
 plt.legend()
 plt.show()
+pygame.quit()
 exit()
