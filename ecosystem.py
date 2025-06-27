@@ -83,24 +83,12 @@ def initialise_ecosystem(num_rabbits, num_foxes, num_food, x_size, y_size):
     fox_min_reproductive_urge = 10
 
     for r in range(num_rabbits):
-        genes = []
-        genes.append("rabbit")
-        genes.append(random.randint(rabbit_min_food_value, 100)) #food value
-        genes.append(random.randint(rabbit_min_efficiency, 100)) #efficiency
-        genes.append(random.randint(rabbit_min_move_distance, 100)) #move distance
-        genes.append(random.randint(rabbit_min_reproductive_urge, 100)) #reproductive urge
-        position = (random.randint(0, x_size), random.randint(0, y_size))
-        rabbits.append(Animal(genes, position))
+        type = "rabbit"
+        rabbits.append(init_animal(type=type))
     
     for f in range(num_foxes):
-        genes = []
-        genes.append("fox")
-        genes.append(random.randint(fox_min_food_value, 100)) #food value
-        genes.append(random.randint(fox_min_efficiency, 100)) #efficiency
-        genes.append(random.randint(fox_min_move_distance, 100)) #move distance
-        genes.append(random.randint(fox_min_reproductive_urge, 100)) #reproductive urge
-        position = (random.randint(0, x_size), random.randint(0, y_size))
-        foxes.append(Animal(genes, position))
+        type = "fox"
+        foxes.append(init_animal(type=type))
 
     for n in range(num_food):
         position = (random.randint(0, x_size), random.randint(0, y_size))
@@ -109,6 +97,34 @@ def initialise_ecosystem(num_rabbits, num_foxes, num_food, x_size, y_size):
 
     ecosystem = [rabbits, foxes, food, x_size, y_size]
     return ecosystem
+
+def init_animal(pos = (-1, -1), type="", x_size=4096, y_size=4096):
+    rabbit_min_food_value = 20
+    rabbit_min_efficiency = 50
+    rabbit_min_move_distance = 50
+    rabbit_min_reproductive_urge = 10
+
+    fox_min_food_value = 50
+    fox_min_efficiency = 50
+    fox_min_move_distance = 50
+    fox_min_reproductive_urge = 10
+
+    if pos == (-1, -1):
+        pos = (random.randint(0, x_size), random.randint(0, y_size))
+
+    genes = []
+    genes.append(type)
+    if type == "rabbit":
+        genes.append(random.randint(rabbit_min_food_value, 100)) #food value
+        genes.append(random.randint(rabbit_min_efficiency, 100)) #efficiency
+        genes.append(random.randint(rabbit_min_move_distance, 100)) #move distance
+        genes.append(random.randint(rabbit_min_reproductive_urge, 100)) #reproductive urge
+    elif type == "fox":
+        genes.append(random.randint(fox_min_food_value, 100)) #food value
+        genes.append(random.randint(fox_min_efficiency, 100)) #efficiency
+        genes.append(random.randint(fox_min_move_distance, 100)) #move distance
+        genes.append(random.randint(fox_min_reproductive_urge, 100)) #reproductive urge
+    return Animal(genes, pos)
 
 def move_animals(ecosystem):
     #print("moving animals")
@@ -335,9 +351,45 @@ def display_ecosystem():
                     d_y = -move_y
                 elif event.key == pygame.K_DOWN:
                     d_y = move_y
+                elif event.key == pygame.K_r:
+                    # Find the nearest rabbit to the current centre and set centre_x, centre_y to its position
+                    alive_rabbits = [r for r in ecosystem[0] if r.alive]
+                    if alive_rabbits:
+                        nearest_rabbit = min(alive_rabbits, key=lambda r: distance((centre_x, centre_y), r.position))
+                        centre_x, centre_y = int(nearest_rabbit.position[0]), int(nearest_rabbit.position[1])
+                elif event.key == pygame.K_f:
+                    # Find the nearest fox to the current centre and set centre_x, centre_y to its position
+                    alive_foxes = [f for f in ecosystem[1] if f.alive]
+                    if alive_foxes:
+                        nearest_fox = min(alive_foxes, key=lambda f: distance((centre_x, centre_y), f.position))
+                        centre_x, centre_y = int(nearest_fox.position[0]), int(nearest_fox.position[1])
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == pygame.BUTTON_MIDDLE:
+                    mouse_x, mouse_y = pygame.mouse.get_pos()
+                    # Convert mouse position to ecosystem coordinates
+                    centre_x = mouse_x + (centre_x - screen_x_size // 2)
+                    centre_y = mouse_y + (centre_y - screen_y_size // 2)
+                if event.button == pygame.BUTTON_LEFT:
+                    mouse_x, mouse_y = pygame.mouse.get_pos()
+                    # Convert mouse position to ecosystem coordinates
+                    f_x = mouse_x + (centre_x - screen_x_size // 2)
+                    f_y = mouse_y + (centre_y - screen_y_size // 2)
+                    pos = (f_x, f_y)
+                    type = "fox"
+                    fox = init_animal(pos=pos, type=type)
+                    ecosystem[1].append(fox)
+                if event.button == pygame.BUTTON_RIGHT:
+                    mouse_x, mouse_y = pygame.mouse.get_pos()
+                    # Convert mouse position to ecosystem coordinates
+                    r_x = mouse_x + (centre_x - screen_x_size // 2)
+                    r_y = mouse_y + (centre_y - screen_y_size // 2)
+                    pos = (r_x, r_y)
+                    type = "rabbit"
+                    rabbit = init_animal(pos=pos, type=type)
+                    ecosystem[0].append(rabbit)
         centre_x += d_x
         centre_y += d_y
-        print(f"Centre: ({centre_x}, {centre_y})")
+        #print(f"Centre: ({centre_x}, {centre_y})")
         #print(count)
         food_respawn_rate = 8  # Number of food items to respawn each iteration
         for i in range(food_respawn_rate):
