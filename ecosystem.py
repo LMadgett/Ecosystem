@@ -286,11 +286,18 @@ def move_animals(ecosystem):
     ecosystem[1] = foxes  # Update the ecosystem with the remaining foxes
 
 def display_ecosystem():
-    num_rabbits = 5
+    num_rabbits = 16
     num_foxes = 2
     num_food = 100
-    x_size = 1024
-    y_size = 1024
+    x_size = 2048
+    y_size = 2048
+    screen_x_size = 1024
+    screen_y_size = 1024
+    d_x = 0
+    d_y = 0
+
+    move_x = 20
+    move_y = 20
 
     rabbit_nums = []
     fox_nums = []
@@ -303,7 +310,7 @@ def display_ecosystem():
     ecosystem = initialise_ecosystem(num_rabbits, num_foxes, num_food, x_size, y_size)
     
     pygame.init()
-    screen = pygame.display.set_mode((ecosystem[3], ecosystem[4]))
+    screen = pygame.display.set_mode((screen_x_size, screen_y_size))
     pygame.display.set_caption("Ecosystem Simulation")
     
     count = 0
@@ -313,6 +320,17 @@ def display_ecosystem():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    running = False
+                elif event.key == pygame.K_LEFT:
+                    d_x -= move_x
+                elif event.key == pygame.K_RIGHT:
+                    d_x += move_x
+                elif event.key == pygame.K_UP:
+                    d_y -= move_y
+                elif event.key == pygame.K_DOWN:
+                    d_y += move_y
         #print(count)
         food_respawn_rate = 2  # Number of food items to respawn each iteration
         for i in range(food_respawn_rate):
@@ -331,19 +349,32 @@ def display_ecosystem():
         food_nums.append(num_fd)
         
         for rabbit in ecosystem[0]:
-            #print(rabbit.position)
             if rabbit.alive:
-                pygame.draw.circle(screen, (255, 255, 0), (int(rabbit.position[0]), int(rabbit.position[1])), 10)
-        
+                pos_x = int(rabbit.position[0] - d_x) 
+                pos_y = int(rabbit.position[1] - d_y)
+                if pos_x < 0 or pos_x >= screen_x_size or pos_y < 0 or pos_y >= screen_y_size:
+                    continue
+                else:
+                    pygame.draw.circle(screen, (255, 255, 0), (pos_x, pos_y), 10)
+
         for fox in ecosystem[1]:
             if fox.alive:
-                pygame.draw.circle(screen, (255, 0, 0), (int(fox.position[0]), int(fox.position[1])), 10)
-                #print(fox.position)
+                pos_x = int(fox.position[0] - d_x)
+                pos_y = int(fox.position[1] - d_y)
+                if pos_x < 0 or pos_x >= screen_x_size or pos_y < 0 or pos_y >= screen_y_size:
+                    continue
+                else:
+                    pygame.draw.circle(screen, (255, 0, 0), (pos_x, pos_y), 10)
         
         for food in ecosystem[2]:
             if food.alive:
-                pygame.draw.circle(screen, (0, 255, 0), (int(food.position[0]), int(food.position[1])), 6)
-        
+                pos_x = int(food.position[0] - d_x)
+                pos_y = int(food.position[1] - d_y)
+                if pos_x < 0 or pos_x >= screen_x_size or pos_y < 0 or pos_y >= screen_y_size:
+                    continue
+                else:
+                    pygame.draw.circle(screen, (0, 255, 0), (pos_x, pos_y), 6)
+
         font = pygame.font.SysFont(None, 36)
         text_surface = font.render(f"Rabbits: {num_r}  Foxes: {num_f}  Food: {num_fd}", True, (255, 255, 255))
         screen.blit(text_surface, (10, 10))
