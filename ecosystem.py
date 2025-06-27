@@ -303,7 +303,7 @@ def move_animals(ecosystem):
 
 def display_ecosystem():
     num_rabbits = 32
-    num_foxes = 4
+    num_foxes = 8
     num_food = 4096
     x_size = 4096
     y_size = 4096
@@ -462,7 +462,7 @@ def display_ecosystem():
         text_surface = font.render(f"Rabbits: {num_r}  Foxes: {num_f}  Food: {num_fd}", True, (255, 255, 255))
         screen.blit(text_surface, (10, 10))
         
-        pygame.time.delay(300)
+        #pygame.time.delay(300)
         pygame.display.flip()
     return (rabbit_nums, fox_nums, food_nums)
 
