@@ -1,5 +1,6 @@
 import random
 import pygame
+import matplotlib
 import matplotlib.pyplot as plt
 
 MUTATION_RATE = 0.1
@@ -18,11 +19,12 @@ class Animal:
 
     def get_eaten(self, predator):
         self.alive = False
-        scaling_factor = 0.1
+        scaling_factor = 0.2
         if self.type == predator.type:
             scaling_factor = 0.05 #cannibalism is less efficient
-        if predator.energy <= 100 - self.food_value * 0.1:
-            predator.energy += self.food_value * scaling_factor
+        transferred_energy = self.food_value * scaling_factor
+        if predator.energy <= 100 - transferred_energy:
+            predator.energy += transferred_energy
         elif predator.energy <= 100:
             predator.energy = 100
     
@@ -45,7 +47,7 @@ class Animal:
                 else:
                     new_genes.append((self.genes[i] + partner.genes[i]) // 2)
         offspring = Animal(new_genes, self.position)
-        reproduction_cost = 0.5
+        reproduction_cost = 0.7
         self.energy -= reproduction_cost * self.reproductive_urge
         partner.energy -= reproduction_cost * partner.reproductive_urge
         return offspring
@@ -61,8 +63,9 @@ class Food:
 
     def get_eaten(self, predator):
         self.alive = False
-        if predator.energy <= 100 - self.food_value * 0.1:
-            predator.energy += self.food_value * 0.1
+        transferred_energy = self.food_value * 0.2
+        if predator.energy <= 100 - transferred_energy:
+            predator.energy += transferred_energy
         elif predator.energy <= 100:
             predator.energy = 100
 
@@ -71,16 +74,6 @@ def initialise_ecosystem(num_rabbits, num_foxes, num_food, x_size, y_size):
     rabbits = []
     food = []
     ecosystem = []
-
-    rabbit_min_food_value = 20
-    rabbit_min_efficiency = 50
-    rabbit_min_move_distance = 50
-    rabbit_min_reproductive_urge = 10
-
-    fox_min_food_value = 50
-    fox_min_efficiency = 50
-    fox_min_move_distance = 50
-    fox_min_reproductive_urge = 10
 
     for r in range(num_rabbits):
         type = "rabbit"
@@ -302,8 +295,8 @@ def move_animals(ecosystem):
     ecosystem[1] = foxes  # Update the ecosystem with the remaining foxes
 
 def display_ecosystem():
-    num_rabbits = 32
-    num_foxes = 8
+    num_rabbits = 24
+    num_foxes = 12
     num_food = 4096
     x_size = 4096
     y_size = 4096
@@ -462,14 +455,14 @@ def display_ecosystem():
         text_surface = font.render(f"Rabbits: {num_r}  Foxes: {num_f}  Food: {num_fd}", True, (255, 255, 255))
         screen.blit(text_surface, (10, 10))
         
-        #pygame.time.delay(300)
+        pygame.time.delay(50)
         pygame.display.flip()
     return (rabbit_nums, fox_nums, food_nums)
 
 (rabbit_nums, fox_nums, food_nums) = display_ecosystem()
 plt.plot(range(len(rabbit_nums)), rabbit_nums, label='Rabbits')
 plt.plot(range(len(fox_nums)), fox_nums, label='Foxes')
-#plt.plot(range(len(food_nums)), food_nums, label='Food')
+plt.plot(range(len(food_nums)), food_nums, label='Food')
 plt.xlabel('Time Steps')
 plt.ylabel('Population')
 plt.title('Ecosystem Simulation')
