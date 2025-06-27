@@ -391,7 +391,7 @@ def display_ecosystem():
         centre_y += d_y
         #print(f"Centre: ({centre_x}, {centre_y})")
         #print(count)
-        food_respawn_rate = 8  # Number of food items to respawn each iteration
+        food_respawn_rate = 32  # Number of food items to respawn each iteration
         for i in range(food_respawn_rate):
             position = (random.randint(0, x_size), random.randint(0, y_size))
             food_value = random.randint(10, 100)
