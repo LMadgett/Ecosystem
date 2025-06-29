@@ -92,14 +92,14 @@ def initialise_ecosystem(num_rabbits, num_foxes, num_food, x_size, y_size):
     return ecosystem
 
 def init_animal(pos = (-1, -1), type="", x_size=4096, y_size=4096):
-    rabbit_min_food_value = 20
-    rabbit_min_efficiency = 50
-    rabbit_min_move_distance = 50
+    rabbit_min_food_value = 10
+    rabbit_min_efficiency = 10
+    rabbit_min_move_distance = 10
     rabbit_min_reproductive_urge = 10
 
-    fox_min_food_value = 50
-    fox_min_efficiency = 50
-    fox_min_move_distance = 50
+    fox_min_food_value = 10
+    fox_min_efficiency = 10
+    fox_min_move_distance = 10
     fox_min_reproductive_urge = 10
 
     if pos == (-1, -1):
@@ -319,12 +319,16 @@ def display_ecosystem():
     avg_r_food_value = 0
     avg_r_move_distance = 0
     avg_f_move_distance = 0
+    avg_r_efficiency = 0
+    avg_f_efficiency = 0
 
     avg_r_reproductive_urges = []
     avg_f_reproductive_urges = []
     avg_r_food_values = []
     avg_r_move_distances = []
     avg_f_move_distances = []
+    avg_r_efficiencies = []
+    avg_f_efficiencies = []
 
     num_r = 0
     num_f = 0
@@ -415,7 +419,7 @@ def display_ecosystem():
         total_r_reproductive_urge = 0
         total_r_food_value = 0
         total_r_move_distance = 0
-        total_f_move_distance = 0
+        total_r_efficiency = 0
         c_r = 0
         c_f = 0
 
@@ -424,6 +428,7 @@ def display_ecosystem():
                 total_r_reproductive_urge += rabbit.reproductive_urge
                 total_r_food_value += rabbit.food_value
                 total_r_move_distance += rabbit.move_distance
+                total_r_efficiency += rabbit.efficiency
                 c_r += 1
                 pos_x = int(rabbit.position[0]) 
                 pos_y = int(rabbit.position[1])
@@ -442,18 +447,22 @@ def display_ecosystem():
         avg_r_reproductive_urge = total_r_reproductive_urge / c_r if c_r > 0 else 0
         avg_r_food_value = total_r_food_value / c_r if c_r > 0 else 0
         avg_r_move_distance = total_r_move_distance / c_r if c_r > 0 else 0
+        avg_r_efficiency = total_r_efficiency / c_r if c_r > 0 else 0
         avg_r_reproductive_urges.append(avg_r_reproductive_urge)
         avg_r_food_values.append(avg_r_food_value)
         avg_r_move_distances.append(avg_r_move_distance)
+        avg_r_efficiencies.append(avg_r_efficiency)
 
         total_f_reproductive_urge = 0
         total_f_move_distance = 0
+        total_f_efficiency = 0
         c_f = 0
 
         for fox in ecosystem[1]:
             if fox.alive:
                 total_f_reproductive_urge += fox.reproductive_urge
                 total_f_move_distance += fox.move_distance
+                total_f_efficiency += fox.efficiency
                 c_f += 1
                 pos_x = int(fox.position[0])
                 pos_y = int(fox.position[1])
@@ -471,8 +480,10 @@ def display_ecosystem():
                     pygame.draw.circle(screen, (255, 0, 0), (draw_x, draw_y), 10)
         avg_f_reproductive_urge = total_f_reproductive_urge / c_f if c_f > 0 else 0
         avg_f_move_distance = total_f_move_distance / c_f if c_f > 0 else 0
+        avg_f_efficiency = total_f_efficiency / c_f if c_f > 0 else 0
         avg_f_reproductive_urges.append(avg_f_reproductive_urge)
         avg_f_move_distances.append(avg_f_move_distance)
+        avg_f_efficiencies.append(avg_f_efficiency)
 
         for food in ecosystem[2]:
             if food.alive:
@@ -497,11 +508,12 @@ def display_ecosystem():
         
         pygame.time.delay(50)
         pygame.display.flip()
-    return ((rabbit_nums, fox_nums, food_nums), (avg_r_reproductive_urges, avg_f_reproductive_urges, avg_r_food_values, avg_r_move_distances, avg_f_move_distances))
+    return ((rabbit_nums, fox_nums, food_nums), (avg_r_reproductive_urges, avg_f_reproductive_urges, avg_r_food_values, avg_r_move_distances, avg_f_move_distances, avg_r_efficiencies, avg_f_efficiencies))
 
-(rabbit_nums, fox_nums, food_nums), (avg_r_reproductive_urges, avg_f_reproductive_urges, avg_r_food_values, avg_r_move_distances, avg_f_move_distances) = display_ecosystem()
+(rabbit_nums, fox_nums, food_nums), (avg_r_reproductive_urges, avg_f_reproductive_urges, avg_r_food_values, avg_r_move_distances, avg_f_move_distances, avg_r_efficiencies, avg_f_efficiencies) = display_ecosystem()
 
 plot_populations = False
+plt.figure(figsize=(16, 9))
 if plot_populations:
     plt.plot(range(len(rabbit_nums)), rabbit_nums, label='Rabbits')
     plt.plot(range(len(fox_nums)), fox_nums, label='Foxes')
@@ -515,6 +527,8 @@ if not plot_populations:
     plt.plot(range(len(avg_r_food_values)), avg_r_food_values, label='Avg Rabbit Food Value')
     plt.plot(range(len(avg_r_move_distances)), avg_r_move_distances, label='Avg Rabbit Move Distance')
     plt.plot(range(len(avg_f_move_distances)), avg_f_move_distances, label='Avg Fox Move Distance')
+    plt.plot(range(len(avg_r_efficiencies)), avg_r_efficiencies, label='Avg Rabbit Efficiency')
+    plt.plot(range(len(avg_f_efficiencies)), avg_f_efficiencies, label='Avg Fox Efficiency')
     plt.xlabel('Time Steps')
     plt.ylabel('Average Values')
     plt.title('Ecosystem Simulation - Average Values')
