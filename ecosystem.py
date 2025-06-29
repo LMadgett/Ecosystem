@@ -512,27 +512,42 @@ def display_ecosystem():
 
 (rabbit_nums, fox_nums, food_nums), (avg_r_reproductive_urges, avg_f_reproductive_urges, avg_r_food_values, avg_r_move_distances, avg_f_move_distances, avg_r_efficiencies, avg_f_efficiencies) = display_ecosystem()
 
-plot_populations = False
 plt.figure(figsize=(16, 9))
-if plot_populations:
-    plt.plot(range(len(rabbit_nums)), rabbit_nums, label='Rabbits')
-    plt.plot(range(len(fox_nums)), fox_nums, label='Foxes')
-    plt.plot(range(len(food_nums)), food_nums, label='Food')
-    plt.xlabel('Time Steps')
-    plt.ylabel('Population')
-    plt.title('Ecosystem Simulation')
-if not plot_populations:
-    plt.plot(range(len(avg_r_reproductive_urges)), avg_r_reproductive_urges, label='Avg Rabbit Reproductive Urge')
-    plt.plot(range(len(avg_f_reproductive_urges)), avg_f_reproductive_urges, label='Avg Fox Reproductive Urge')
-    plt.plot(range(len(avg_r_food_values)), avg_r_food_values, label='Avg Rabbit Food Value')
-    plt.plot(range(len(avg_r_move_distances)), avg_r_move_distances, label='Avg Rabbit Move Distance')
-    plt.plot(range(len(avg_f_move_distances)), avg_f_move_distances, label='Avg Fox Move Distance')
-    plt.plot(range(len(avg_r_efficiencies)), avg_r_efficiencies, label='Avg Rabbit Efficiency')
-    plt.plot(range(len(avg_f_efficiencies)), avg_f_efficiencies, label='Avg Fox Efficiency')
-    plt.xlabel('Time Steps')
-    plt.ylabel('Average Values')
-    plt.title('Ecosystem Simulation - Average Values')
+
+# Plot populations
+plt.subplot(2, 1, 1)
+ax1 = plt.gca()
+ax2 = ax1.twinx()
+
+ax1.plot(range(len(rabbit_nums)), rabbit_nums, label='Rabbits', color='tab:blue')
+#ax1.plot(range(len(food_nums)), food_nums, label='Food', color='tab:green')
+ax2.plot(range(len(fox_nums)), fox_nums, label='Foxes', color='tab:orange')
+
+ax1.set_xlabel('Time Steps')
+ax1.set_ylabel('Rabbit Population', color='tab:blue')
+ax2.set_ylabel('Fox Population', color='tab:orange')
+
+ax1.set_title('Ecosystem Simulation - Populations')
+
+lines_1, labels_1 = ax1.get_legend_handles_labels()
+lines_2, labels_2 = ax2.get_legend_handles_labels()
+ax1.legend(lines_1 + lines_2, labels_1 + labels_2, loc='upper right')
+
+# Plot average values
+plt.subplot(2, 1, 2)
+plt.plot(range(len(avg_r_reproductive_urges)), avg_r_reproductive_urges, label='Avg R Rep Urge')
+plt.plot(range(len(avg_f_reproductive_urges)), avg_f_reproductive_urges, label='Avg F Rep Urge')
+plt.plot(range(len(avg_r_food_values)), avg_r_food_values, label='Avg R Fd Val')
+plt.plot(range(len(avg_r_move_distances)), avg_r_move_distances, label='Avg R Mv Dis')
+plt.plot(range(len(avg_f_move_distances)), avg_f_move_distances, label='Avg F Mv Dis')
+plt.plot(range(len(avg_r_efficiencies)), avg_r_efficiencies, label='Avg R Eff')
+plt.plot(range(len(avg_f_efficiencies)), avg_f_efficiencies, label='Avg F Eff')
+plt.xlabel('Time Steps')
+plt.ylabel('Average Values')
+plt.title('Ecosystem Simulation - Average Values')
 plt.legend()
+
+plt.tight_layout()
 plt.show()
 pygame.quit()
 exit()
