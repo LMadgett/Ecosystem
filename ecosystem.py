@@ -314,6 +314,18 @@ def display_ecosystem():
     fox_nums = []
     food_nums = []
 
+    avg_r_reproductive_urge = 0
+    avg_f_reproductive_urge = 0
+    avg_r_food_value = 0
+    avg_r_move_distance = 0
+    avg_f_move_distance = 0
+
+    avg_r_reproductive_urges = []
+    avg_f_reproductive_urges = []
+    avg_r_food_values = []
+    avg_r_move_distances = []
+    avg_f_move_distances = []
+
     num_r = 0
     num_f = 0
     num_fd = 0
@@ -400,8 +412,19 @@ def display_ecosystem():
         fox_nums.append(num_f)
         food_nums.append(num_fd)
         
+        total_r_reproductive_urge = 0
+        total_r_food_value = 0
+        total_r_move_distance = 0
+        total_f_move_distance = 0
+        c_r = 0
+        c_f = 0
+
         for rabbit in ecosystem[0]:
             if rabbit.alive:
+                total_r_reproductive_urge += rabbit.reproductive_urge
+                total_r_food_value += rabbit.food_value
+                total_r_move_distance += rabbit.move_distance
+                c_r += 1
                 pos_x = int(rabbit.position[0]) 
                 pos_y = int(rabbit.position[1])
                 # Check if rabbit is within the visible screen area centered on (centre_x, centre_y)
@@ -416,9 +439,22 @@ def display_ecosystem():
                     draw_x = pos_x - screen_left
                     draw_y = pos_y - screen_top
                     pygame.draw.circle(screen, (255, 255, 0), (draw_x, draw_y), 10)
+        avg_r_reproductive_urge = total_r_reproductive_urge / c_r if c_r > 0 else 0
+        avg_r_food_value = total_r_food_value / c_r if c_r > 0 else 0
+        avg_r_move_distance = total_r_move_distance / c_r if c_r > 0 else 0
+        avg_r_reproductive_urges.append(avg_r_reproductive_urge)
+        avg_r_food_values.append(avg_r_food_value)
+        avg_r_move_distances.append(avg_r_move_distance)
+
+        total_f_reproductive_urge = 0
+        total_f_move_distance = 0
+        c_f = 0
 
         for fox in ecosystem[1]:
             if fox.alive:
+                total_f_reproductive_urge += fox.reproductive_urge
+                total_f_move_distance += fox.move_distance
+                c_f += 1
                 pos_x = int(fox.position[0])
                 pos_y = int(fox.position[1])
                 # Check if fox is within the visible screen area centered on (centre_x, centre_y)
@@ -433,6 +469,10 @@ def display_ecosystem():
                     draw_x = pos_x - screen_left
                     draw_y = pos_y - screen_top
                     pygame.draw.circle(screen, (255, 0, 0), (draw_x, draw_y), 10)
+        avg_f_reproductive_urge = total_f_reproductive_urge / c_f if c_f > 0 else 0
+        avg_f_move_distance = total_f_move_distance / c_f if c_f > 0 else 0
+        avg_f_reproductive_urges.append(avg_f_reproductive_urge)
+        avg_f_move_distances.append(avg_f_move_distance)
 
         for food in ecosystem[2]:
             if food.alive:
@@ -457,15 +497,27 @@ def display_ecosystem():
         
         pygame.time.delay(50)
         pygame.display.flip()
-    return (rabbit_nums, fox_nums, food_nums)
+    return ((rabbit_nums, fox_nums, food_nums), (avg_r_reproductive_urges, avg_f_reproductive_urges, avg_r_food_values, avg_r_move_distances, avg_f_move_distances))
 
-(rabbit_nums, fox_nums, food_nums) = display_ecosystem()
-plt.plot(range(len(rabbit_nums)), rabbit_nums, label='Rabbits')
-plt.plot(range(len(fox_nums)), fox_nums, label='Foxes')
-plt.plot(range(len(food_nums)), food_nums, label='Food')
-plt.xlabel('Time Steps')
-plt.ylabel('Population')
-plt.title('Ecosystem Simulation')
+(rabbit_nums, fox_nums, food_nums), (avg_r_reproductive_urges, avg_f_reproductive_urges, avg_r_food_values, avg_r_move_distances, avg_f_move_distances) = display_ecosystem()
+
+plot_populations = False
+if plot_populations:
+    plt.plot(range(len(rabbit_nums)), rabbit_nums, label='Rabbits')
+    plt.plot(range(len(fox_nums)), fox_nums, label='Foxes')
+    plt.plot(range(len(food_nums)), food_nums, label='Food')
+    plt.xlabel('Time Steps')
+    plt.ylabel('Population')
+    plt.title('Ecosystem Simulation')
+if not plot_populations:
+    plt.plot(range(len(avg_r_reproductive_urges)), avg_r_reproductive_urges, label='Avg Rabbit Reproductive Urge')
+    plt.plot(range(len(avg_f_reproductive_urges)), avg_f_reproductive_urges, label='Avg Fox Reproductive Urge')
+    plt.plot(range(len(avg_r_food_values)), avg_r_food_values, label='Avg Rabbit Food Value')
+    plt.plot(range(len(avg_r_move_distances)), avg_r_move_distances, label='Avg Rabbit Move Distance')
+    plt.plot(range(len(avg_f_move_distances)), avg_f_move_distances, label='Avg Fox Move Distance')
+    plt.xlabel('Time Steps')
+    plt.ylabel('Average Values')
+    plt.title('Ecosystem Simulation - Average Values')
 plt.legend()
 plt.show()
 pygame.quit()
