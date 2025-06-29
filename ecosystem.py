@@ -19,7 +19,7 @@ class Animal:
 
     def get_eaten(self, predator):
         self.alive = False
-        scaling_factor = 0.2
+        scaling_factor = 0.5
         if self.type == predator.type:
             scaling_factor = 0.05 #cannibalism is less efficient
         transferred_energy = self.food_value * scaling_factor
@@ -63,7 +63,8 @@ class Food:
 
     def get_eaten(self, predator):
         self.alive = False
-        transferred_energy = self.food_value * 0.2
+        scaling_factor = 0.2
+        transferred_energy = self.food_value * scaling_factor
         if predator.energy <= 100 - transferred_energy:
             predator.energy += transferred_energy
         elif predator.energy <= 100:
@@ -372,6 +373,9 @@ def display_ecosystem():
                     if alive_foxes:
                         nearest_fox = min(alive_foxes, key=lambda f: distance((centre_x, centre_y), f.position))
                         centre_x, centre_y = int(nearest_fox.position[0]), int(nearest_fox.position[1])
+                elif event.key == pygame.K_p:
+                    running = False
+                    break
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == pygame.BUTTON_MIDDLE:
                     mouse_x, mouse_y = pygame.mouse.get_pos()
